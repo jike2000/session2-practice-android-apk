@@ -1,0 +1,48 @@
+plugins {
+    id 'com.android.application' version '8.9.2'
+}
+
+def releaseKeystore = providers.environmentVariable('KEYSTORE_FILE')
+
+android {
+    namespace 'com.jike2000.practice4'
+    compileSdk 35
+    buildToolsVersion '35.0.0'
+
+    defaultConfig {
+        applicationId 'com.jike2000.practice4'
+        minSdk 23
+        targetSdk 35
+        versionCode 1
+        versionName '1.0.0'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    signingConfigs {
+        if (releaseKeystore.isPresent()) {
+            release {
+                storeFile file(releaseKeystore.get())
+                storeType 'PKCS12'
+                storePassword providers.environmentVariable('KEYSTORE_PASSWORD').get()
+                keyAlias providers.environmentVariable('KEY_ALIAS').get()
+                keyPassword providers.environmentVariable('KEY_PASSWORD').get()
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix '.debug'
+            versionNameSuffix '-debug'
+        }
+        release {
+            if (releaseKeystore.isPresent()) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+}

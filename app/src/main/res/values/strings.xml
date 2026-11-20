@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Practice 4</string>
+    <string name="course_name">Data Engineering · Practice 4</string>
+    <string name="screen_title">Android APK</string>
+    <string name="screen_description">A sample app for building and signing APKs with GitHub Actions.</string>
+</resources>

@@ -1,0 +1,52 @@
+name: Android Release Build
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: true
+      - name: Build signed release APK
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          : "${KEYSTORE_BASE64:?Set the KEYSTORE_BASE64 repository secret}"
+          : "${KEYSTORE_PASSWORD:?Set the KEYSTORE_PASSWORD repository secret}"
+          : "${KEY_ALIAS:?Set the KEY_ALIAS repository secret}"
+          : "${KEY_PASSWORD:?Set the KEY_PASSWORD repository secret}"
+          umask 077
+          export KEYSTORE_FILE="$RUNNER_TEMP/practice4-signing.p12"
+          trap 'rm -f -- "$KEYSTORE_FILE"' EXIT
+          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE_FILE"
+          ./gradlew --no-daemon assembleRelease
+      - name: Verify release APK signature
+        run: |
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs \
+            app/build/outputs/apk/release/app-release.apk
+      - name: Upload signed APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
+          retention-days: 30
