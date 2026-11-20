@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = 'Practice4Android'
+rootProject.name = 'CowbellPractice4'
 include ':app'

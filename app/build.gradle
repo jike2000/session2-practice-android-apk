@@ -5,7 +5,7 @@ plugins {
 def releaseKeystore = providers.environmentVariable('KEYSTORE_FILE')
 
 android {
-    namespace 'com.jike2000.practice4'
+    namespace 'com.beyondtechnicallycorrect.cowbell'
     compileSdk 35
     buildToolsVersion '35.0.0'
 

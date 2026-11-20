@@ -40,7 +40,7 @@ jobs:
           retention-days: 7
 
   install-debug:
-    name: Install and launch on emulator
+    name: Install and ring Cowbell on emulator
     needs: build-debug
     runs-on: ubuntu-24.04
     timeout-minutes: 20
@@ -55,7 +55,7 @@ jobs:
             sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-      - name: Install and launch the APK
+      - name: Install the APK and simulate a cowbell swing
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35
@@ -64,5 +64,10 @@ jobs:
           disable-animations: true
           script: |
             adb install -r apk/app-debug.apk
-            adb shell am start -W -n com.jike2000.practice4.debug/com.jike2000.practice4.MainActivity
+            adb emu sensor set acceleration 0:0:9.81
+            adb shell am start -W -n com.jike2000.practice4.debug/com.beyondtechnicallycorrect.cowbell.CowbellActivity
             adb shell pidof com.jike2000.practice4.debug
+            adb logcat -c
+            adb emu sensor set acceleration 12:0:9.81
+            sleep 2
+            adb logcat -d -s CowbellActivity:D | grep -F 'Cowbell sound started'
