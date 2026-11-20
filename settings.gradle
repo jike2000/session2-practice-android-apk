@@ -11,6 +11,14 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven {
+            name = 'MavenCentralCdn'
+            url = uri('https://repo1.maven.org/maven2/')
+            content {
+                includeGroup 'org.codehaus.groovy'
+                includeGroup 'org.apache.httpcomponents'
+            }
+        }
     }
 }
 
